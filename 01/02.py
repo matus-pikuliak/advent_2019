@@ -2,8 +2,7 @@ def fuel(weight):
     req = weight // 3 - 2
     if req > 0:
         return req + fuel(req)
-    else:
-        return 0
+    return 0
 
 print(
     sum(
