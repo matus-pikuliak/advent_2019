@@ -1,31 +1,19 @@
-orbits = [
-    tuple(line.strip().split(')'))
+orbits = dict(
+    reversed(line.strip().split(')'))
     for line
     in open('input')
-]
-
-planets = {
-    planet: None
-    for orbit in orbits
-        for planet in orbit
-}
+)
 
 
-def compute(planet):
-    if planets[planet] is not None:
-        return planets[planet]
-    planets[planet] = sum(
-        compute(orbiting) + 1
-        for (orbited, orbiting)
-        in orbits
-        if orbited == planet
-    )
-    return planets[planet]
+def get_orbited(planet):
+    if planet in orbits:
+        return {orbits[planet]} | get_orbited(orbits[planet])
+    return set()
 
 print(
     sum(
-        compute(planet)
+        len(get_orbited(planet))
         for planet
-        in planets
+        in set(orbits.keys()) | set(orbits.values())
     )
 )
