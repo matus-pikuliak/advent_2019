@@ -8,10 +8,16 @@ code = [
     in open('input').read().split(',')
 ]
 
-i = IntCode(code, [1]).run()
-while True:
-    print(next(i))
+computer = IntCode(code).run()
+next(computer)
+computer.send(1)
+for res in computer:
+    print(res)
 
-i = IntCode(code, [2]).run()
-while True:
-    print(next(i))
+
+computer = IntCode(code).run()
+next(computer)
+computer.send(2)
+for res in computer:
+    print(res)
+
