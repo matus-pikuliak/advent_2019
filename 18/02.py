@@ -1,3 +1,7 @@
+import itertools
+import pprint
+
+
 def neighbours(point):
     x, y = point
     ns = []
@@ -48,7 +52,8 @@ for point in sorted(points):
 # remove if the key does not unlock anything and is seen on path to other key
 out = set()
 for point in points:
-    if any(point in seen_value for seen_value in seen.values()) and not any(point in need_value for need_value in needs.values()):
+    if any(point in seen_value for seen_value in seen.values()) \
+            and not any(point in need_value for need_value in needs.values()):
         out.add(point)
 
 points = {k: v for k, v in points.items() if k not in out}
@@ -56,10 +61,31 @@ for point in sorted(points):
     seen[points[point]] -= out
     needs[points[point]] -= out
 
+depends = {map[point]: need for point, need in needs.items()}
 
+for point in depends:
+    while True:
+        in_len = len(depends[point])
+        for p in list(depends[point]):
+            depends[point] = depends[point].union(depends[p])
+        out_len = len(depends[point])
+        if out_len == in_len:
+            break
+
+sector_points = [[] for _ in range(4)]
+for point, xy in points.items():
+    x, y = xy
+    if x > 40 and y > 40:
+        sector_points[0].append(point)
+    if x > 40 and y < 40:
+        sector_points[1].append(point)
+    if x < 40 and y > 40:
+        sector_points[2].append(point)
+    if x < 40 and y < 40:
+        sector_points[3].append(point)
 
 cache = {}
-def path(a, b):
+def path_len(a, b):
 
     if (a, b) in cache:
         return cache[(a, b)]
@@ -84,15 +110,31 @@ def path(a, b):
     return cache[(a, b)]
 
 
-min = 10**10
+min = 10 ** 10
+for paths in itertools.product(*[
+    itertools.permutations(sector_points[i])
+    for i in
+    range(4)
+]):
 
-for paths in permutations:
-
-    if deadlock(paths):
+    try:
+        for path in paths:
+            for x, y in itertools.combinations(path, r=2):
+                if y in depends[x]:
+                    raise AttributeError
+    except AttributeError:
         continue
 
-    out = simulate(paths)
-    if min > out:
-        min = out
+
+    total = 0
+    for path in paths:
+        start = '@'
+        for end in path:
+            total += path_len(start, end)
+            start = end
+    total -= 8
+    if total < min:
+        min = total
 
 print(min)
+
