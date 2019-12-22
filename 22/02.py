@@ -7,7 +7,7 @@ steps = 101741582076661
 
 a = 1
 b = 0
-for line in open(file):
+for line in open(file).readlines():
     words = line.split()
 
     if words[1] == 'with':
@@ -21,6 +21,12 @@ for line in open(file):
     else:
         cut = int(words[-1])
         b -= cut
+
+    a %= deck_size
+    b %= deck_size
+
+a = pow(a, deck_size-2, deck_size)
+b = - a * b
 
 cache = {0: (a, b)}
 for i in range(1, 50):
